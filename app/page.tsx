@@ -2,6 +2,7 @@ import Header from "@/components/ui/header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import Image from "next/image";
 
 const Home = () => {
   return (
@@ -21,7 +22,7 @@ const Home = () => {
         </div>
 
         <div className="relative mt-6 h-[150px] w-full">
-          <image
+          <Image
             alt="Agende nos melhores com FSW Barber"
             src="/banner-01.png"
             fill
