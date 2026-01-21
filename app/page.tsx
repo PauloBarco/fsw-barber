@@ -19,6 +19,15 @@ const Home = () => {
             <Search className="h-4 w-4" />
           </Button>
         </div>
+
+        <div className="relative mt-6 h-[150px] w-full">
+          <image
+            alt="Agende nos melhores com FSW Barber"
+            src="/banner-01.png"
+            fill
+            className="rounded-xl object-cover"
+          />
+        </div>
       </div>
     </div>
   );
