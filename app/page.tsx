@@ -1,26 +1,27 @@
 import Header from "@/components/ui/header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Badge, Search } from "lucide-react";
 import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Home = () => {
   return (
     <div>
       {/* header */}
       <Header />
-
+      {/* Texto */}
       <div className="p-5">
         <h2 className="text-xl font-bold">Olá, Paulo</h2>
         <p>Segunda-feira, 19 de janeiro.</p>
-
+        {/* Busca */}
         <div className="mt-6 flex items-center gap-2">
           <Input placeholder="Faça sua Busca..." />
           <Button size="icon">
             <Search className="h-4 w-4" />
           </Button>
         </div>
-
+        {/* Imagem */}
         <div className="relative mt-6 h-[150px] w-full">
           <Image
             alt="Agende nos melhores com FSW Barber"
@@ -29,6 +30,17 @@ const Home = () => {
             className="rounded-xl object-cover"
           />
         </div>
+
+        {/* Agendamento */}
+        <Card className="mt-6">
+          <CardContent className="flex">
+            {/* Esquerda */}
+            <div className="flex flex-col gap-2 py-5">
+              <Badge>/Confirmado</Badge>
+              <h3>Corte de Cabelo</h3>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
