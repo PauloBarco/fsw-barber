@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { db } from "./_lib/prisma";
-import BarbershopItem from "@/components/barbershop-item";
+import BarbershopItem from "@/components/ui/barbershop-item";
 
 const Home = async () => {
   // chamar meu banco de dados
