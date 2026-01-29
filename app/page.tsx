@@ -9,6 +9,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { db } from "./_lib/prisma";
 import BarbershopItem from "@/components/ui/barbershop-item";
 
+export const runtime = "nodejs";
+
 const Home = async () => {
   // chamar meu banco de dados
   const barbershops = await db.barbershop.findMany({});
