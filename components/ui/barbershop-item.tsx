@@ -10,10 +10,11 @@ const BarbershopItem = ({ barbershop }: BarbershopItemProps) => {
     <card>
       <CardContent>
         <div className="relative h-[159px]">
-          <Image fil className="object-cover" src={barbershop.imageUrl}/>
+          <Image fil className="object-cover" src={barbershop.imageUrl} />
         </div>
       </CardContent>
     </card>
+  );
 };
 
 export default BarbershopItem;
