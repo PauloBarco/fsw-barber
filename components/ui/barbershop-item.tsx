@@ -1,5 +1,6 @@
 import { Barbershop } from "@prisma/client";
-import { CardContent } from "./card";
+import Image from "next/image";
+import { Card, CardContent } from "./card";
 
 interface BarbershopItemProps {
   barbershop: Barbershop;
@@ -7,13 +8,18 @@ interface BarbershopItemProps {
 
 const BarbershopItem = ({ barbershop }: BarbershopItemProps) => {
   return (
-    <card>
+    <Card>
       <CardContent>
-        <div className="relative h-[159px]">
-          <Image fil className="object-cover" src={barbershop.imageUrl} />
+        <div className="relative h-[159px] w-full">
+          <Image
+            src={barbershop.imageUrl}
+            alt={barbershop.name}
+            fill
+            className="object-cover rounded-md"
+          />
         </div>
       </CardContent>
-    </card>
+    </Card>
   );
 };
 
