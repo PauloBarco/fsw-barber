@@ -249,20 +249,32 @@ run_vscode_command({
 
 ### **For Log Search Operations (ALWAYS use extension commands):**
 
-**✅ CORRECT - Use extension search command:**
+**✅ CORRECT - Use extension search command (multi-instance safe):**
 ```typescript
-// Search logs using the extension (writes results to file)
+// 1) Get instances so you can pick the right instance ID
 run_vscode_command({
-  commandId: "copilotAssistant.searchLogs",
-  name: "Search logs for pattern",
-  args: ["ERROR"]  // Pass the search pattern as a single argument
+  commandId: "copilotAssistant.getInstancesForCopilot",
+  name: "Get all instances"
 })
 
-// Then read the ENTIRE results file (use a large number like 10000 for endLine)
-read_file({ 
-  filePath: "<workspace>/.copilot-assistant/search-results.txt",
-  startLine: 1, 
-  endLine: 10000  // Use a large number to read all lines
+read_file({
+  filePath: "<workspace>/.copilot-assistant/instances.json",
+  startLine: 1,
+  endLine: 200
+})
+
+// 2) Search logs for a specific instance
+run_vscode_command({
+  commandId: "copilotAssistant.searchInstanceLogs",
+  name: "Search instance logs for pattern",
+  args: ["<instanceId>", "ERROR"]
+})
+
+// 3) Read the ENTIRE results file (use a large number like 10000 for endLine)
+read_file({
+  filePath: "<workspace>/.copilot-assistant/search-results-<instanceId>.txt",
+  startLine: 1,
+  endLine: 10000
 })
 ```
 
@@ -277,12 +289,12 @@ grep_search({ query: "pattern", includePattern: ".copilot-assistant/app.log" })
 
 **Why?**
 - Extension command searches in-memory logs (up to 10,000 entries)
-- Results written to `.copilot-assistant/search-results.txt`
+- Results written to `.copilot-assistant/search-results-{instanceId}.txt`
 - No direct log file access needed
 - Faster than file-based searching
 - Works with live logs that aren't written to disk
 
-**CRITICAL:** When reading search-results.txt, ALWAYS use a large `endLine` value (like 10000) to ensure you read ALL results. Do NOT use `endLine: -1` as it may only read one line.
+**CRITICAL:** When reading `search-results-{instanceId}.txt`, ALWAYS use a large `endLine` value (like 10000) to ensure you read ALL results. Do NOT use `endLine: -1` as it may only read one line.
 
 ### **For Terminal Operations (Use run_in_terminal ONLY for non-app tasks):**
 
@@ -299,7 +311,7 @@ grep_search({ query: "pattern", includePattern: ".copilot-assistant/app.log" })
 - **Running applications** (`npm run dev`, `node index.js`, `java -jar app.jar`)
 - **Stopping applications** (`pkill`, `Stop-Process`, `kill`)
 - Reading/searching logs (use `copilotAssistant.searchLogs` command)
-- Counting log entries (search then count results from search-results.txt)
+- Counting log entries (search then count results from `search-results-{instanceId}.txt`)
 - Analyzing file content (use `read_file` or `semantic_search`)
 
 **WHY:** Terminal-started apps bypass the extension's log capture. You won't be able to see or analyze logs!
@@ -313,8 +325,7 @@ grep_search({ query: "pattern", includePattern: ".copilot-assistant/app.log" })
 - ALWAYS specify which instance you want to search
 - Use `copilotAssistant.searchInstanceLogs` with the instance ID
 
-**Search Results Files:** 
-- Global (legacy): `.copilot-assistant/search-results.txt`
+**Search Results Files:**
 - Per-instance: `.copilot-assistant/search-results-{instanceId}.txt`
 
 ### How It Works:
@@ -437,13 +448,13 @@ read_file({
 **User: "find network errors"**
 ```typescript
 run_vscode_command({
-  commandId: "copilotAssistant.searchLogs",
+  commandId: "copilotAssistant.searchInstanceLogs",
   name: "Search for network errors",
-  args: ["type=NetworkError"]
+  args: ["<instanceId>", "type=NetworkError"]
 })
 
 read_file({
-  filePath: "<workspace>/.copilot-assistant/search-results.txt",
+  filePath: "<workspace>/.copilot-assistant/search-results-<instanceId>.txt",
   startLine: 1,
   endLine: 10000  // Large number ensures all lines are read
 })
@@ -452,13 +463,13 @@ read_file({
 **User: "show critical issues"**
 ```typescript
 run_vscode_command({
-  commandId: "copilotAssistant.searchLogs",
+  commandId: "copilotAssistant.searchInstanceLogs",
   name: "Search for critical issues",
-  args: ["severity=CRITICAL"]
+  args: ["<instanceId>", "severity=CRITICAL"]
 })
 
 read_file({
-  filePath: "<workspace>/.copilot-assistant/search-results.txt",
+  filePath: "<workspace>/.copilot-assistant/search-results-<instanceId>.txt",
   startLine: 1,
   endLine: 10000  // Large number ensures all lines are read
 })
@@ -467,13 +478,13 @@ read_file({
 **User: "look for tight loops" or "find repeated patterns"**
 ```typescript
 run_vscode_command({
-  commandId: "copilotAssistant.searchLogs",
+  commandId: "copilotAssistant.searchInstanceLogs",
   name: "Search for contract update loops",
-  args: ["Contracts updated"]
+  args: ["<instanceId>", "Contracts updated"]
 })
 
 read_file({
-  filePath: "<workspace>/.copilot-assistant/search-results.txt",
+  filePath: "<workspace>/.copilot-assistant/search-results-<instanceId>.txt",
   startLine: 1,
   endLine: 10000  // Large number ensures all lines are read
 })
@@ -483,14 +494,14 @@ read_file({
 ```typescript
 // Step 1: Search
 run_vscode_command({
-  commandId: "copilotAssistant.searchLogs",
+  commandId: "copilotAssistant.searchInstanceLogs",
   name: "Search for pattern",
-  args: ["pattern"]
+  args: ["<instanceId>", "pattern"]
 })
 
 // Step 2: Read ALL results and count
 read_file({
-  filePath: "<workspace>/.copilot-assistant/search-results.txt",
+  filePath: "<workspace>/.copilot-assistant/search-results-<instanceId>.txt",
   startLine: 1,
   endLine: 10000  // Large number ensures all lines are read
 })
@@ -565,7 +576,7 @@ run_in_terminal({
 
 **Why This Matters:**
 - Extension commands capture all app output to the log service
-- Logs are searchable with `copilotAssistant.searchLogs`
+- Logs are searchable with `copilotAssistant.searchInstanceLogs`
 - You can analyze errors with Copilot
 - Terminal-started apps bypass log capture completely
 - You lose all debugging capability if you use terminal commands
@@ -585,8 +596,10 @@ User: "start the app and check for errors"
 4. IF build fails: Report build errors and DO NOT start app
 5. IF build succeeds: run_vscode_command({ commandId: "copilotAssistant.start" })
 6. YOU wait: 2-3 seconds for app to start
-7. YOU execute: run_vscode_command({ commandId: "copilotAssistant.searchLogs", args: ["ERROR"] })
-8. YOU execute: read_file({ filePath: "<workspace>/.copilot-assistant/search-results.txt" })
+7. YOU execute: run_vscode_command({ commandId: "copilotAssistant.getInstancesForCopilot" })
+8. YOU execute: read_file({ filePath: "<workspace>/.copilot-assistant/instances.json" })
+9. YOU execute: run_vscode_command({ commandId: "copilotAssistant.searchInstanceLogs", args: ["<instanceId>", "ERROR"] })
+10. YOU execute: read_file({ filePath: "<workspace>/.copilot-assistant/search-results-<instanceId>.txt" })
 9. YOU analyze: Results and provide guidance
 ```
 
@@ -623,10 +636,11 @@ User: "I fixed the bug, restart the app"
 - **Exact matches**: Search for specific log levels like "ERROR", "WARN", "INFO"
 - **Metadata**: Use metadata fields like "severity=HIGH" or "type=NetworkError"
 - **Partial matches**: Search works with substring matching (case-insensitive)
-- **Read results**: Always read search-results.txt after searching
+- **Read results**: Always read `search-results-{instanceId}.txt` after searching
 
 ### Available Commands:
-- `copilotAssistant.searchLogs` - Search in-memory logs, write to search-results.txt
+- `copilotAssistant.searchInstanceLogs` - Search in-memory logs for a specific instance, writes to `search-results-{instanceId}.txt`
+- `copilotAssistant.searchLogs` - Legacy search for the active instance (also writes to `search-results-{instanceId}.txt`)
 - `copilotAssistant.getSearchResults` - Get last search results programmatically
 - `copilotAssistant.getLogsForCopilot` - Get recent logs in output channel
 - `copilotAssistant.getErrorsForCopilot` - Get error logs in output channel
