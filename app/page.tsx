@@ -34,6 +34,30 @@ const Home = async () => {
             <Search className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Busaca Rapida*/}
+        <div className="flex gap-3">
+          <Button className="flex items-center gap-2" variant="secondary">
+            <Image src="/cabelo.svg" width={16} height={16} alt="Cabelo" />
+            Cabelo
+          </Button>
+
+          <Button className="flex items-center gap-2" variant="secondary">
+            <Image src="/barba.svg" width={16} height={16} alt="Barba" />
+            Barba
+          </Button>
+
+          <Button className="flex items-center gap-2" variant="secondary">
+            <Image
+              src="/acabamento.svg"
+              width={16}
+              height={16}
+              alt="Acabamento"
+            />
+            Acabamento
+          </Button>
+        </div>
+
         {/* Imagem */}
         <div className="relative mt-6 h-[150px] w-full">
           <Image
