@@ -8,11 +8,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { db } from "./_lib/prisma";
 import BarbershopItem from "@/components/ui/barbershop-item";
+import { quickSearchOptions } from "./_constants/search";
 
 export const runtime = "nodejs";
 
 const Home = async () => {
-  // chamar meu banco de dados
   const barbershops = await db.barbershop.findMany({});
   const popularbarbershops = await db.barbershop.findMany({
     orderBy: { name: "desc" },
@@ -27,6 +27,7 @@ const Home = async () => {
       <div className="p-5">
         <h2 className="text-xl font-bold">Olá, Paulo</h2>
         <p>Segunda-feira, 19 de janeiro.</p>
+
         {/* Busca */}
         <div className="mt-6 flex items-center gap-2">
           <Input placeholder="Faça sua Busca..." />
@@ -36,26 +37,18 @@ const Home = async () => {
         </div>
 
         {/* Busaca Rapida*/}
-        <div className="flex gap-3">
-          <Button className="flex items-center gap-2" variant="secondary">
-            <Image src="/cabelo.svg" width={16} height={16} alt="Cabelo" />
-            Cabelo
-          </Button>
-
-          <Button className="flex items-center gap-2" variant="secondary">
-            <Image src="/barba.svg" width={16} height={16} alt="Barba" />
-            Barba
-          </Button>
-
-          <Button className="flex items-center gap-2" variant="secondary">
-            <Image
-              src="/acabamento.svg"
-              width={16}
-              height={16}
-              alt="Acabamento"
-            />
-            Acabamento
-          </Button>
+        <div className="mt-6 flex gap-3 overflow-x-scroll [&::-webkit-scrollbar]:hidden">
+          {quickSearchOptions.map((option) => (
+            <Button className="gap-2" variant="secondary" key={option.title}>
+              <Image
+                src={option.imageUrl}
+                width={16}
+                height={16}
+                alt={option.title}
+              />
+              {option.title}
+            </Button>
+          ))}
         </div>
 
         {/* Imagem */}
