@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
 import { db } from "./_lib/prisma";
 import BarbershopItem from "@/components/ui/barbershop-item";
 import { quickSearchOptions } from "./_constants/search";
@@ -81,16 +80,6 @@ const Home = async () => {
           ))}
         </div>
       </div>
-      <footer>
-        <Card>
-          <CardContent className="px-5 py-6">
-            <p className="text-sm text-gray-400">
-              © 2023 Copyright
-              <span className="font-bold">FSW Barber</span>
-            </p>
-          </CardContent>
-        </Card>
-      </footer>
     </div>
   );
 };
