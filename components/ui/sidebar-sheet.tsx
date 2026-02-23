@@ -1,12 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import {
-  CalendarIcon,
-  HomeIcon,
-  LogIn,
-  LogInIcon,
-  LogOutIcon,
-} from "lucide-react";
+import { CalendarIcon, HomeIcon, LogInIcon, LogOutIcon } from "lucide-react";
 import Link from "next/link";
 import {
   SheetContent,
@@ -15,7 +9,9 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { quickSearchOptions } from "@/app/_constants/search";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+{
+  /*import { Avatar, AvatarImage } from "@/components/ui/avatar";*/
+}
 import {
   Dialog,
   DialogContent,
