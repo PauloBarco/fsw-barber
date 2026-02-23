@@ -2,16 +2,18 @@ import { db } from "@/app/_lib/prisma";
 import PhoneItem from "@/components/phone-item";
 import ServiceItem from "@/components/service-item";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetTrigger } from "@/components/ui/sheet";
+import SidebarSheet from "@/components/ui/sidebar-sheet";
 import { ChevronLeftIcon, MapPinIcon, MenuIcon, StarIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-const BarbershopPage = async ({
-  params,
-}: {
+interface PageProps {
   params: Promise<{ id: string }>;
-}) => {
+}
+
+const BarbershopPage = async ({ params }: PageProps) => {
   const { id } = await params;
 
   const barbershop = await db.barbershop.findUnique({
@@ -22,7 +24,7 @@ const BarbershopPage = async ({
   });
 
   if (!barbershop) {
-    return notFound();
+    notFound();
   }
 
   return (
@@ -30,8 +32,8 @@ const BarbershopPage = async ({
       {/* Imagem */}
       <div className="relative h-[250px] w-full">
         <Image
-          src={barbershop?.imageUrl ?? "/placeholder.png"}
-          alt={barbershop?.name ?? "Barbershop"}
+          src={barbershop.imageUrl ?? "/placeholder.png"}
+          alt={barbershop.name}
           fill
           className="object-cover"
         />
@@ -46,20 +48,26 @@ const BarbershopPage = async ({
           </Link>
         </Button>
 
-        <Button
-          size="icon"
-          variant="secondary"
-          className="absolute right-4 top-4">
-          <MenuIcon />
-        </Button>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              size="icon"
+              variant="outline"
+              className="absolute right-4 top-4">
+              <MenuIcon />
+            </Button>
+          </SheetTrigger>
+          <SidebarSheet />
+        </Sheet>
       </div>
 
-      {/*Título*/}
-      <div className="p-5 border-b border-solid">
-        <h1 className="text-xl font-bold mb-3">{barbershop?.name}</h1>
+      {/* Conteúdo */}
+      <div className="p-5 border-b">
+        <h1 className="text-xl font-bold mb-3">{barbershop.name}</h1>
+
         <div className="flex items-center gap-2">
           <MapPinIcon className="text-primary" size={18} />
-          <p className="text-sm">{barbershop?.address}</p>
+          <p className="text-sm">{barbershop.address}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -68,22 +76,16 @@ const BarbershopPage = async ({
         </div>
       </div>
 
-      {/*Descrição*/}
-      <div className="p-5 border-b border-solid space-y-2">
-        <h2 className="text-xs font-bold uppercase text-gray-400">Sobre nós</h2>
-        <p className="text-sm text-justify">{barbershop?.description}</p>
-      </div>
-      {/*Serviços*/}
-      <div className="space-y-3 border-b border-solid p-5">
+      {/* Serviços */}
+      <div className="space-y-3 border-b p-5">
         <h2 className="text-xs font-bold uppercase text-gray-400">Serviços</h2>
-        <div className="space-y-3">
-          {barbershop?.services.map((service) => (
-            <ServiceItem key={service.id} service={service} />
-          ))}
-        </div>
+
+        {barbershop.services.map((service) => (
+          <ServiceItem key={service.id} service={service} />
+        ))}
       </div>
 
-      {/* Contato */}
+      {/* Telefones */}
       <div className="p-5 space-y-3">
         {barbershop.phones.map((phone, index) => (
           <PhoneItem key={`${phone}-${index}`} phone={phone} />
