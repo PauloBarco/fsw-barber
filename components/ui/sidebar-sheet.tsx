@@ -11,9 +11,6 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { quickSearchOptions } from "@/app/_constants/search";
-{
-  /*import { Avatar, AvatarImage } from "@/components/ui/avatar";*/
-}
 import {
   Dialog,
   DialogContent,
