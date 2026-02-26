@@ -1,25 +1,16 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import dotenv from "dotenv";
 
-dotenv.config();
-
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL não definida no .env");
-}
-
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const prisma = new PrismaClient({
-  adapter,
-});
-
-export default async function seed() {}
+const prisma = new PrismaClient();
 
 async function seedDatabase() {
   try {
+    console.log("🌱 Iniciando seed...");
+
+    // Limpa dados antigos (ordem importa por causa das relações)
+    await prisma.booking.deleteMany();
+    await prisma.barbershopService.deleteMany();
+    await prisma.barbershop.deleteMany();
+
     const images = [
       "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png",
       "https://utfs.io/f/45331760-899c-4b4b-910e-e00babb6ed81-16q.png",
@@ -110,7 +101,7 @@ async function seedDatabase() {
           name: creativeNames[i],
           address: addresses[i],
           imageUrl: images[i],
-          phones: ["(11) 99999-9999", "(11) 99999-9999"],
+          phones: ["(11) 99999-9999", "(11) 98888-8888"],
           description:
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         },
@@ -119,14 +110,19 @@ async function seedDatabase() {
       for (const service of services) {
         await prisma.barbershopService.create({
           data: {
-            ...service,
+            name: service.name,
+            description: service.description,
+            price: service.price,
+            imageUrl: service.imageUrl,
             barbershopId: barbershop.id,
           },
         });
       }
     }
+
+    console.log("✅ Seed executado com sucesso!");
   } catch (error) {
-    console.error("Erro ao criar as barbearias:", error);
+    console.error("❌ Erro ao executar seed:", error);
   } finally {
     await prisma.$disconnect();
   }
