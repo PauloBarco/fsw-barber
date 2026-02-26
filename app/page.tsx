@@ -7,10 +7,29 @@ import BarbershopItem from "@/components/ui/barbershop-item";
 import { quickSearchOptions } from "./_constants/search";
 import BookingItem from "@/components/ui/booking-item";
 
+interface HomeProps {
+  searchParams: Promise<{
+    search?: string;
+  }>;
+}
+
 export const runtime = "nodejs";
 
-const Home = async () => {
-  const barbershops = await db.barbershop.findMany({});
+const Home = async ({ searchParams }: HomeProps) => {
+  const params = await searchParams;
+  const search = params?.search;
+
+  const barbershops = await db.barbershop.findMany({
+    where: search
+      ? {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        }
+      : {},
+  });
+
   const popularbarbershops = await db.barbershop.findMany({
     orderBy: { name: "desc" },
   });
@@ -26,9 +45,20 @@ const Home = async () => {
         <p>Segunda-feira, 19 de janeiro.</p>
 
         {/* Busca */}
-        <div className="mt-6">
-          <Search />
-        </div>
+        <form className="relative mt-6" action="/">
+          <Search
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
+
+          <input
+            type="text"
+            name="search"
+            defaultValue={params?.search}
+            placeholder="Buscar barbearias..."
+            className="w-full rounded-xl bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-primary"
+          />
+        </form>
 
         {/* Busaca Rapida*/}
         <div className="mt-6 flex gap-3 overflow-x-scroll [&::-webkit-scrollbar]:hidden">

@@ -9,11 +9,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-interface PageProps {
+const BarbershopPage = async ({
+  params,
+}: {
   params: Promise<{ id: string }>;
-}
-
-const BarbershopPage = async ({ params }: PageProps) => {
+}) => {
   const { id } = await params;
 
   const barbershop = await db.barbershop.findUnique({

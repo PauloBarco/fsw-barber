@@ -60,14 +60,6 @@ const SidebarSheet = () => {
             </Button>
           </DialogContent>
         </Dialog>
-        {/* <Avatar>
-          <AvatarImage src="https://images.unsplash.com/photo-1608889175123-8ee362201f81?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjB8fGF2YXRhcnxlbnwwfHwwfHx8MA%3D%3D" />
-        </Avatar>
-
-        <div>
-          <p className="font-bold">Paulo Barco</p>
-          <p className="text-xs">paulo.barco34@gmail.com</p>
-        </div>*/}
       </div>
 
       {/* Menu principal */}
@@ -94,14 +86,16 @@ const SidebarSheet = () => {
           <Button
             key={option.title}
             variant="ghost"
-            className="justify-start gap-2">
-            <Image
-              src={option.imageUrl}
-              alt={option.title}
-              height={18}
-              width={18}
-            />
-            {option.title}
+            className="justify-start gap-2 asChild">
+            <Link href={`/barbershops?search=${option.title}`}>
+              <Image
+                src={option.imageUrl}
+                alt={option.title}
+                height={18}
+                width={18}
+              />
+              {option.title}
+            </Link>
           </Button>
         ))}
       </div>

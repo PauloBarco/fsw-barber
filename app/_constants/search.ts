@@ -1,4 +1,5 @@
 interface QuickSearchOptions {
+  [x: string]: string;
   imageUrl: string;
   title: string;
 }
