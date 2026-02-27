@@ -1,6 +1,6 @@
 import Header from "@/components/ui/header";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Link, Search } from "lucide-react";
 import Image from "next/image";
 import { db } from "./_lib/prisma";
 import BarbershopItem from "@/components/ui/barbershop-item";
@@ -8,16 +8,16 @@ import { quickSearchOptions } from "./_constants/search";
 import BookingItem from "@/components/ui/booking-item";
 
 interface HomeProps {
-  searchParams: Promise<{
+  searchParams?: {
     search?: string;
-  }>;
+  };
 }
 
 export const runtime = "nodejs";
 
 const Home = async ({ searchParams }: HomeProps) => {
+  const search = searchParams?.search;
   const params = await searchParams;
-  const search = params?.search;
 
   const barbershops = await db.barbershop.findMany({
     where: search
@@ -63,14 +63,20 @@ const Home = async ({ searchParams }: HomeProps) => {
         {/* Busaca Rapida*/}
         <div className="mt-6 flex gap-3 overflow-x-scroll [&::-webkit-scrollbar]:hidden">
           {quickSearchOptions.map((option) => (
-            <Button className="gap-2" variant="secondary" key={option.title}>
-              <Image
-                src={option.imageUrl}
-                width={16}
-                height={16}
-                alt={option.title}
-              />
-              {option.title}
+            <Button
+              className="gap-2"
+              variant="secondary"
+              key={option.title}
+              asChild>
+              <Link href={`/babershops?services=${option.title}`}>
+                <Image
+                  src={option.imageUrl}
+                  width={16}
+                  height={16}
+                  alt={option.title}
+                />
+                {option.title}
+              </Link>
             </Button>
           ))}
         </div>
