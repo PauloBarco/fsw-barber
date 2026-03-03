@@ -27,6 +27,15 @@ const BarbershopPage = async ({
     notFound();
   }
 
+  const serializedServices = barbershop.services.map((service) => ({
+    id: service.id,
+    name: service.name,
+    description: service.description,
+    imageUrl: service.imageUrl,
+    price: Number(service.price),
+    barbershopId: service.barbershopId,
+  }));
+
   return (
     <div>
       {/* Imagem */}
@@ -80,7 +89,7 @@ const BarbershopPage = async ({
       <div className="space-y-3 border-b p-5">
         <h2 className="text-xs font-bold uppercase text-gray-400">Serviços</h2>
 
-        {barbershop.services.map((service) => (
+        {serializedServices.map((service) => (
           <ServiceItem key={service.id} service={service} />
         ))}
       </div>

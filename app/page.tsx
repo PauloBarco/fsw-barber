@@ -1,6 +1,7 @@
 import Header from "@/components/ui/header";
 import { Button } from "@/components/ui/button";
-import { Link, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 import { db } from "./_lib/prisma";
 import BarbershopItem from "@/components/ui/barbershop-item";
@@ -60,7 +61,7 @@ const Home = async ({ searchParams }: HomeProps) => {
           />
         </form>
 
-        {/* Busaca Rapida*/}
+        {/* BUSCA RÁPIDA */}
         <div className="mt-6 flex gap-3 overflow-x-scroll [&::-webkit-scrollbar]:hidden">
           {quickSearchOptions.map((option) => (
             <Button
@@ -68,7 +69,7 @@ const Home = async ({ searchParams }: HomeProps) => {
               variant="secondary"
               key={option.title}
               asChild>
-              <Link href={`/babershops?services=${option.title}`}>
+              <Link href={`/barbershops?search=${option.title}`}>
                 <Image
                   src={option.imageUrl}
                   width={16}
