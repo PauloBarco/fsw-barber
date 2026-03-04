@@ -90,7 +90,11 @@ const BarbershopPage = async ({
         <h2 className="text-xs font-bold uppercase text-gray-400">Serviços</h2>
 
         {serializedServices.map((service) => (
-          <ServiceItem key={service.id} service={service} />
+          <ServiceItem
+            key={service.id}
+            barbershop={{ name: barbershop.name }}
+            service={service}
+          />
         ))}
       </div>
 
