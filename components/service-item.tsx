@@ -15,7 +15,10 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { createBooking } from "@/app/_actions/create-booking";
 
 interface Service {
   id: string;
@@ -58,6 +61,7 @@ const TIME_LIST = [
 ];
 
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
+  const { data } = useSession();
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     undefined,
@@ -69,6 +73,29 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
   const handleTimeSelected = (time: string) => {
     setSelectedTime(time);
+  };
+
+  const handleCreateBooking = async () => {
+    try {
+      if (!selectedDay || !selectedTime) return;
+
+      const hour = Number(selectedTime.split(":")[0]);
+      const minute = Number(selectedTime.split(":")[1]);
+
+      const newDate = set(selectedDay, {
+        hours: hour,
+        minutes: minute,
+      });
+      await createBooking({
+        serviceId: service.id,
+        userId: data?.user?.id,
+        date: newDate,
+      });
+      toast.success("Reserva criada com sucesso!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao criar reserva. Tente novamente.");
+    }
   };
 
   return (
@@ -192,7 +219,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                         </div>
                         <SheetFooter className="px-5">
                           <SheetClose asChild>
-                            <Button type="submit">Confirmar Agendamento</Button>
+                            <Button onClick={handleCreateBooking}>
+                              Confirmar Agendamento
+                            </Button>
                           </SheetClose>
                         </SheetFooter>
                       </CardContent>
