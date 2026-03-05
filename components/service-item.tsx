@@ -88,7 +88,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
       });
       await createBooking({
         serviceId: service.id,
-        userId: data?.user?.id,
+        userId: "cmm0v1nox0000mbvgxu7potee",
         date: newDate,
       });
       toast.success("Reserva criada com sucesso!");
