@@ -7,6 +7,7 @@ import { db } from "./_lib/prisma";
 import BarbershopItem from "@/components/ui/barbershop-item";
 import { quickSearchOptions } from "./_constants/search";
 import BookingItem from "@/components/ui/booking-item";
+import HomeHeader from "@/components/ui/home-header";
 
 interface HomeProps {
   searchParams?: {
@@ -18,7 +19,7 @@ export const runtime = "nodejs";
 
 const Home = async ({ searchParams }: HomeProps) => {
   const search = searchParams?.search;
-  const params = await searchParams;
+  const params = searchParams;
 
   const barbershops = await db.barbershop.findMany({
     where: search
@@ -42,8 +43,7 @@ const Home = async ({ searchParams }: HomeProps) => {
       <Header />
       {/* Texto */}
       <div className="p-5">
-        <h2 className="text-xl font-bold">Olá, Paulo</h2>
-        <p>Segunda-feira, 19 de janeiro.</p>
+        <HomeHeader />
 
         {/* Busca */}
         <form className="relative mt-6" action="/">

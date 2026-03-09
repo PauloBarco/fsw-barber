@@ -16,8 +16,14 @@ const BarbershopPage = async ({
 }) => {
   const { id } = await params;
 
+  if (!id) {
+    notFound();
+  }
+
   const barbershop = await db.barbershop.findUnique({
-    where: { id },
+    where: {
+      id: id,
+    },
     include: {
       services: true,
     },

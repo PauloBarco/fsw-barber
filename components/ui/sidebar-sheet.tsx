@@ -19,9 +19,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const SidebarSheet = () => {
+  const { data: session } = useSession();
+
   const handleLoginWithGoogleClick = () => signIn("google");
   return (
     <SheetContent className="overflow-y-auto">
@@ -29,37 +31,59 @@ const SidebarSheet = () => {
         <SheetTitle className="text-left">Menu</SheetTitle>
       </SheetHeader>
 
-      <div className="py-5 border-b flex items-center justify-between border-solid gap-3">
-        <h2 className="font-bold">Olá, faça seu login</h2>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button size="icon">
-              <LogInIcon />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="w-[90%]">
-            <DialogHeader>
-              <DialogTitle>Faça login na plataforma</DialogTitle>
-              <DialogDescription>
-                Conecte-se usuando sua conta do Google para acessar todos os
-                recursos disponíveis.
-              </DialogDescription>
-            </DialogHeader>
+      <div className="flex items-center gap-3">
+        {session?.user?.image && (
+          <Image
+            src={session.user.image}
+            alt={session.user.name ?? "Usuário"}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+        )}
 
-            <Button
-              variant="outline"
-              className="gap-1 font-bold"
-              onClick={handleLoginWithGoogleClick}>
-              <Image
-                src="/google.svg"
-                alt="Fazer login com o Google"
-                width={18}
-                height={18}
-              />
-              Continuar com Google
-            </Button>
-          </DialogContent>
-        </Dialog>
+        <div>
+          <h2 className="font-bold">
+            {session?.user
+              ? `Olá, ${session.user.name}`
+              : "Olá, faça seu login"}
+          </h2>
+
+          {session?.user?.email && (
+            <p className="text-xs text-gray-400">{session.user.email}</p>
+          )}
+        </div>
+        {!session?.user && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size="icon">
+                <LogInIcon />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="w-[90%]">
+              <DialogHeader>
+                <DialogTitle>Faça login na plataforma</DialogTitle>
+                <DialogDescription>
+                  Conecte-se usuando sua conta do Google para acessar todos os
+                  recursos disponíveis.
+                </DialogDescription>
+              </DialogHeader>
+
+              <Button
+                variant="outline"
+                className="gap-1 font-bold"
+                onClick={handleLoginWithGoogleClick}>
+                <Image
+                  src="/google.svg"
+                  alt="Fazer login com o Google"
+                  width={18}
+                  height={18}
+                />
+                Continuar com Google
+              </Button>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* Menu principal */}
@@ -100,10 +124,15 @@ const SidebarSheet = () => {
       </div>
 
       <div className="flex flex-col gap-2 py-5">
-        <Button variant="ghost" className="justify-start gap-2">
-          <LogOutIcon size={18} />
-          Sai da Conta
-        </Button>
+        {session?.user && (
+          <Button
+            variant="ghost"
+            className="justify-start gap-2"
+            onClick={() => signOut()}>
+            <LogOutIcon size={18} />
+            Sair da Conta
+          </Button>
+        )}
       </div>
     </SheetContent>
   );
