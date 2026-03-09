@@ -19,7 +19,6 @@ export const runtime = "nodejs";
 
 const Home = async ({ searchParams }: HomeProps) => {
   const search = searchParams?.search;
-  const params = searchParams;
 
   const barbershops = await db.barbershop.findMany({
     where: search
@@ -55,7 +54,7 @@ const Home = async ({ searchParams }: HomeProps) => {
           <input
             type="text"
             name="search"
-            defaultValue={params?.search}
+            defaultValue={search} // <-- use a variável já resolvida
             placeholder="Buscar barbearias..."
             className="w-full rounded-xl bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-primary"
           />
