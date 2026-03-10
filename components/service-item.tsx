@@ -294,7 +294,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
       </Card>
 
       <Dialog open={signInDialogIsOpen} onOpenChange={setSignInDialogIsOpen}>
-        <DialogContent>
+        <DialogContent className="w-[90%]">
           <SignInDialog />
         </DialogContent>
       </Dialog>
