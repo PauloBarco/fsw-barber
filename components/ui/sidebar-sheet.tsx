@@ -11,20 +11,13 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { quickSearchOptions } from "@/app/_constants/search";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { signOut, useSession } from "next-auth/react";
+import SingInDialog from "./sign-in-dialog";
 
 const SidebarSheet = () => {
   const { data: session } = useSession();
 
-  const handleLoginWithGoogleClick = () => signIn("google");
   return (
     <SheetContent className="overflow-y-auto">
       <SheetHeader>
@@ -61,26 +54,7 @@ const SidebarSheet = () => {
               </Button>
             </DialogTrigger>
             <DialogContent className="w-[90%]">
-              <DialogHeader>
-                <DialogTitle>Faça login na plataforma</DialogTitle>
-                <DialogDescription>
-                  Conecte-se usuando sua conta do Google para acessar todos os
-                  recursos disponíveis.
-                </DialogDescription>
-              </DialogHeader>
-
-              <Button
-                variant="outline"
-                className="gap-1 font-bold"
-                onClick={handleLoginWithGoogleClick}>
-                <Image
-                  src="/google.svg"
-                  alt="Fazer login com o Google"
-                  width={18}
-                  height={18}
-                />
-                Continuar com Google
-              </Button>
+              <SingInDialog />
             </DialogContent>
           </Dialog>
         )}
