@@ -8,6 +8,8 @@ import BarbershopItem from "@/components/ui/barbershop-item";
 import { quickSearchOptions } from "./_constants/search";
 import BookingItem from "@/components/ui/booking-item";
 import HomeHeader from "@/components/ui/home-header";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
 interface HomeProps {
   searchParams?: {
@@ -18,8 +20,10 @@ interface HomeProps {
 export const runtime = "nodejs";
 
 const Home = async ({ searchParams }: HomeProps) => {
+  const session = await getServerSession(authOptions);
   const search = searchParams?.search;
 
+  // BUSCA BARBEARIAS
   const barbershops = await db.barbershop.findMany({
     where: search
       ? {
@@ -31,20 +35,44 @@ const Home = async ({ searchParams }: HomeProps) => {
       : {},
   });
 
+  // BARBEARIAS POPULARES
   const popularbarbershops = await db.barbershop.findMany({
-    orderBy: { name: "desc" },
+    orderBy: {
+      name: "desc",
+    },
   });
 
-  console.log({ barbershops });
+  // AGENDAMENTOS DO USUÁRIO
+  const bookings = session?.user
+    ? await db.booking.findMany({
+        where: {
+          userId: session.user.id as string,
+        },
+        orderBy: {
+          date: "asc",
+        },
+        include: {
+          service: {
+            include: {
+              barbershop: true,
+            },
+          },
+        },
+      })
+    : [];
+
+  // PRÓXIMO AGENDAMENTO
+  const nextBooking = bookings[0];
+
   return (
     <div>
-      {/* header */}
+      {/* HEADER */}
       <Header />
-      {/* Texto */}
+
       <div className="p-5">
         <HomeHeader />
 
-        {/* Busca */}
+        {/* BUSCA */}
         <form className="relative mt-6" action="/">
           <Search
             size={18}
@@ -54,7 +82,7 @@ const Home = async ({ searchParams }: HomeProps) => {
           <input
             type="text"
             name="search"
-            defaultValue={search} // <-- use a variável já resolvida
+            defaultValue={search}
             placeholder="Buscar barbearias..."
             className="w-full rounded-xl bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-primary"
           />
@@ -81,7 +109,7 @@ const Home = async ({ searchParams }: HomeProps) => {
           ))}
         </div>
 
-        {/* Imagem */}
+        {/* BANNER */}
         <div className="relative mt-6 h-[150px] w-full">
           <Image
             alt="Agende nos melhores com FSW Barber"
@@ -91,21 +119,33 @@ const Home = async ({ searchParams }: HomeProps) => {
           />
         </div>
 
-        {/* Agendamento */}
-        <BookingItem />
+        {/* PRÓXIMO AGENDAMENTO */}
+        {nextBooking && (
+          <>
+            <h2 className="mb-3 mt-6 text-xs font-bold uppercase text-gray-400">
+              Seu próximo agendamento
+            </h2>
 
+            <BookingItem booking={nextBooking} />
+          </>
+        )}
+
+        {/* RECOMENDADOS */}
         <h2 className="mb-3 mt-6 text-xs font-bold uppercase text-gray-400">
           Recomendados
         </h2>
+
         <div className="flex gap-4 overflow-auto [&::-webkit-scrollbar]:hidden">
           {barbershops.map((barbershop) => (
             <BarbershopItem key={barbershop.id} barbershop={barbershop} />
           ))}
         </div>
 
+        {/* POPULARES */}
         <h2 className="mb-3 mt-6 text-xs font-bold uppercase text-gray-400">
           Populares
         </h2>
+
         <div className="flex gap-4 overflow-auto [&::-webkit-scrollbar]:hidden">
           {popularbarbershops.map((barbershop) => (
             <BarbershopItem key={barbershop.id} barbershop={barbershop} />
