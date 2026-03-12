@@ -21,9 +21,10 @@ export const runtime = "nodejs";
 
 const Home = async ({ searchParams }: HomeProps) => {
   const session = await getServerSession(authOptions);
-  const search = searchParams?.search;
 
-  // BUSCA BARBEARIAS
+  const params = await searchParams;
+  const search = params?.search;
+
   const barbershops = await db.barbershop.findMany({
     where: search
       ? {
