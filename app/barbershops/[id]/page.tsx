@@ -1,54 +1,42 @@
-import { db } from "@/app/_lib/prisma";
-import PhoneItem from "@/components/phone-item";
-import ServiceItem from "@/components/service-item";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetTrigger } from "@/components/ui/sheet";
-import SidebarSheet from "@/components/ui/sidebar-sheet";
-import { ChevronLeftIcon, MapPinIcon, MenuIcon, StarIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import PhoneItem from "@/app/_components/phone-item"
+import ServiceItem from "@/app/_components/service-item"
+import SidebarSheet from "@/app/_components/sidebar-sheet"
+import { Button } from "@/app/_components/ui/button"
+import { Sheet, SheetTrigger } from "@/app/_components/ui/sheet"
+import { db } from "@/app/_lib/prisma"
+import { ChevronLeftIcon, MapPinIcon, MenuIcon, StarIcon } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { notFound } from "next/navigation"
 
-const BarbershopPage = async ({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) => {
-  const { id } = await params;
-
-  if (!id) {
-    notFound();
+interface BarbershopPageProps {
+  params: {
+    id: string
   }
+}
 
+const BarbershopPage = async ({ params }: BarbershopPageProps) => {
+  // chamar o meu banco de dados
   const barbershop = await db.barbershop.findUnique({
     where: {
-      id: id,
+      id: params.id,
     },
     include: {
       services: true,
     },
-  });
+  })
 
   if (!barbershop) {
-    notFound();
+    return notFound()
   }
-
-  const serializedServices = barbershop.services.map((service) => ({
-    id: service.id,
-    name: service.name,
-    description: service.description,
-    imageUrl: service.imageUrl,
-    price: Number(service.price),
-    barbershopId: service.barbershopId,
-  }));
 
   return (
     <div>
-      {/* Imagem */}
+      {/* IMAGEM */}
       <div className="relative h-[250px] w-full">
         <Image
-          src={barbershop.imageUrl ?? "/placeholder.png"}
           alt={barbershop.name}
+          src={barbershop?.imageUrl}
           fill
           className="object-cover"
         />
@@ -57,7 +45,8 @@ const BarbershopPage = async ({
           size="icon"
           variant="secondary"
           className="absolute left-4 top-4"
-          asChild>
+          asChild
+        >
           <Link href="/">
             <ChevronLeftIcon />
           </Link>
@@ -68,7 +57,8 @@ const BarbershopPage = async ({
             <Button
               size="icon"
               variant="outline"
-              className="absolute right-4 top-4">
+              className="absolute right-4 top-4"
+            >
               <MenuIcon />
             </Button>
           </SheetTrigger>
@@ -76,42 +66,48 @@ const BarbershopPage = async ({
         </Sheet>
       </div>
 
-      {/* Conteúdo */}
-      <div className="p-5 border-b">
-        <h1 className="text-xl font-bold mb-3">{barbershop.name}</h1>
-
-        <div className="flex items-center gap-2">
+      {/* TÍTULO */}
+      <div className="border-b border-solid p-5">
+        <h1 className="mb-3 text-xl font-bold">{barbershop.name}</h1>
+        <div className="mb-2 flex items-center gap-2">
           <MapPinIcon className="text-primary" size={18} />
-          <p className="text-sm">{barbershop.address}</p>
+          <p className="text-sm">{barbershop?.address}</p>
         </div>
 
         <div className="flex items-center gap-2">
-          <StarIcon className="text-primary fill-primary" size={18} />
+          <StarIcon className="fill-primary text-primary" size={18} />
           <p className="text-sm">5,0 (499 avaliações)</p>
         </div>
       </div>
 
-      {/* Serviços */}
-      <div className="space-y-3 border-b p-5">
-        <h2 className="text-xs font-bold uppercase text-gray-400">Serviços</h2>
-
-        {serializedServices.map((service) => (
-          <ServiceItem
-            key={service.id}
-            barbershop={{ name: barbershop.name }}
-            service={service}
-          />
-        ))}
+      {/* DESCRIÇÃO */}
+      <div className="space-y-2 border-b border-solid p-5">
+        <h2 className="text-xs font-bold uppercase text-gray-400">Sobre nós</h2>
+        <p className="text-justify text-sm">{barbershop?.description}</p>
       </div>
 
-      {/* Telefones */}
-      <div className="p-5 space-y-3">
-        {barbershop.phones.map((phone, index) => (
-          <PhoneItem key={`${phone}-${index}`} phone={phone} />
+      {/* SERVIÇOS */}
+      <div className="space-y-3 border-b border-solid p-5">
+        <h2 className="text-xs font-bold uppercase text-gray-400">Serviços</h2>
+        <div className="space-y-3">
+          {barbershop.services.map((service) => (
+            <ServiceItem
+              key={service.id}
+              barbershop={JSON.parse(JSON.stringify(barbershop))}
+              service={JSON.parse(JSON.stringify(service))}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* CONTATO */}
+      <div className="space-y-3 p-5">
+        {barbershop.phones.map((phone) => (
+          <PhoneItem key={phone} phone={phone} />
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default BarbershopPage;
+export default BarbershopPage

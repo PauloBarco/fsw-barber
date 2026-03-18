@@ -1,148 +1,57 @@
-import Header from "@/components/ui/header";
-import BookingItem from "@/components/ui/booking-item";
-import { db } from "../_lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
-import { notFound } from "next/navigation";
-import { Prisma } from "@prisma/client";
-
-// 🔥 TIPAGEM DO PRISMA (COM RELAÇÕES)
-type BookingWithRelations = Prisma.BookingGetPayload<{
-  include: {
-    service: {
-      include: {
-        barbershop: true;
-      };
-    };
-  };
-}>;
-
-// 🔥 DTO (O QUE O FRONT VAI RECEBER)
-type BookingFormatted = {
-  id: string;
-  date: Date;
-  service: {
-    id: string;
-    name: string;
-    description: string;
-    imageUrl: string;
-    price: number; // ✅ AGORA É NUMBER
-    barbershopId: string;
-    barbershop: {
-      id: string;
-      name: string;
-      imageUrl: string;
-      address: string;
-      description: string;
-      phones: string[];
-      createdAt: Date;
-      updatedAt: Date;
-    };
-  };
-};
-
-// 🔥 FUNÇÃO QUE REMOVE O DECIMAL
-const formatBooking = (booking: BookingWithRelations): BookingFormatted => ({
-  ...booking,
-  service: {
-    ...booking.service,
-    price: Number(booking.service.price), // 💥 AQUI RESOLVE
-    barbershop: booking.service.barbershop,
-  },
-});
+import { getServerSession } from "next-auth"
+import Header from "../_components/header"
+import { authOptions } from "../_lib/auth"
+import { notFound } from "next/navigation"
+import BookingItem from "../_components/booking-item"
+import { getConfirmedBookings } from "../_data/get-confirmed-bookings"
+import { getConcludedBookings } from "../_data/get-concluded-bookings"
 
 const Bookings = async () => {
-  const session = await getServerSession(authOptions);
-
+  const session = await getServerSession(authOptions)
   if (!session?.user) {
-    return notFound();
+    // TODO: mostrar pop-up de login
+    return notFound()
   }
-
-  // 🔥 BUSCAS
-  const confirmedBookingsRaw = await db.booking.findMany({
-    where: {
-      userId: session.user.id,
-      date: {
-        gte: new Date(),
-      },
-    },
-    include: {
-      service: {
-        include: {
-          barbershop: true,
-        },
-      },
-    },
-    orderBy: {
-      date: "asc",
-    },
-  });
-
-  const concludedBookingsRaw = await db.booking.findMany({
-    where: {
-      userId: session.user.id,
-      date: {
-        lt: new Date(),
-      },
-    },
-    include: {
-      service: {
-        include: {
-          barbershop: true,
-        },
-      },
-    },
-    orderBy: {
-      date: "desc",
-    },
-  });
-
-  // 🔥 CONVERSÃO FINAL (REMOVE DECIMAL)
-  const confirmedBookings: BookingFormatted[] =
-    confirmedBookingsRaw.map(formatBooking);
-
-  const concludedBookings: BookingFormatted[] =
-    concludedBookingsRaw.map(formatBooking);
+  const confirmedBookings = await getConfirmedBookings()
+  const concludedBookings = await getConcludedBookings()
 
   return (
     <>
       <Header />
-
-      <div className="space-y-6 p-5">
+      <div className="space-y-3 p-5">
         <h1 className="text-xl font-bold">Agendamentos</h1>
-
         {confirmedBookings.length === 0 && concludedBookings.length === 0 && (
-          <p>Você ainda não possui agendamentos.</p>
+          <p className="text-gray-400">Você não tem agendamentos.</p>
         )}
-
-        {/* FUTUROS */}
         {confirmedBookings.length > 0 && (
           <>
-            <h2 className="text-sm font-semibold text-gray-400 uppercase">
+            <h2 className="mb-3 mt-6 text-xs font-bold uppercase text-gray-400">
               Confirmados
             </h2>
-
             {confirmedBookings.map((booking) => (
-              <BookingItem key={booking.id} booking={booking} />
+              <BookingItem
+                key={booking.id}
+                booking={JSON.parse(JSON.stringify(booking))}
+              />
             ))}
           </>
         )}
-
-        {/* PASSADOS */}
         {concludedBookings.length > 0 && (
           <>
-            <h2 className="text-sm font-semibold text-gray-400 uppercase">
+            <h2 className="mb-3 mt-6 text-xs font-bold uppercase text-gray-400">
               Finalizados
             </h2>
-
             {concludedBookings.map((booking) => (
-              <BookingItem key={booking.id} booking={booking} />
+              <BookingItem
+                key={booking.id}
+                booking={JSON.parse(JSON.stringify(booking))}
+              />
             ))}
           </>
         )}
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Bookings;
+export default Bookings
