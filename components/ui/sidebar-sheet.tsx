@@ -1,15 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon, HomeIcon, LogInIcon, LogOutIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetClose,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon, HomeIcon, LogInIcon, LogOutIcon } from "lucide-react";
 import { quickSearchOptions } from "@/app/_constants/search";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { signOut, useSession } from "next-auth/react";
@@ -17,14 +18,20 @@ import SingInDialog from "./sign-in-dialog";
 
 const SidebarSheet = () => {
   const { data: session } = useSession();
+  const pathname = usePathname();
+
+  const isActive = (path: string) =>
+    pathname === path ? "bg-accent font-semibold" : "";
 
   return (
     <SheetContent className="overflow-y-auto">
+      {/* HEADER */}
       <SheetHeader>
         <SheetTitle className="text-left">Menu</SheetTitle>
       </SheetHeader>
 
-      <div className="flex items-center gap-3">
+      {/* USER */}
+      <div className="flex items-center gap-3 py-4">
         {session?.user?.image && (
           <Image
             src={session.user.image}
@@ -35,7 +42,7 @@ const SidebarSheet = () => {
           />
         )}
 
-        <div>
+        <div className="flex-1">
           <h2 className="font-bold">
             {session?.user
               ? `Olá, ${session.user.name}`
@@ -46,6 +53,7 @@ const SidebarSheet = () => {
             <p className="text-xs text-gray-400">{session.user.email}</p>
           )}
         </div>
+
         {!session?.user && (
           <Dialog>
             <DialogTrigger asChild>
@@ -60,26 +68,35 @@ const SidebarSheet = () => {
         )}
       </div>
 
-      {/* Menu principal */}
-      <div className="flex flex-col gap-2 border-b border-solid py-5">
+      {/* MENU PRINCIPAL */}
+      <div className="flex flex-col gap-2 border-b py-5">
+        {/* HOME */}
         <SheetClose asChild>
-          <Button className="justify-start gap-2" variant="ghost" asChild>
-            <Link href="/">
-              <HomeIcon size={18} />
-              Início
-            </Link>
-          </Button>
+          <Link
+            href="/"
+            className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent ${isActive(
+              "/",
+            )}`}>
+            <HomeIcon size={18} />
+            Início
+          </Link>
         </SheetClose>
-        <Button className="justify-start gap-2" variant="ghost" asChild>
-          <Link href="/bookings">
+
+        {/* BOOKINGS */}
+        <SheetClose asChild>
+          <Link
+            href="/bookings"
+            className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent ${isActive(
+              "/bookings",
+            )}`}>
             <CalendarIcon size={18} />
             Agendamentos
           </Link>
-        </Button>
+        </SheetClose>
       </div>
 
-      {/* Busca rápida */}
-      <div className="flex flex-col gap-2 py-5 border-b border-solid">
+      {/* BUSCA RÁPIDA */}
+      <div className="flex flex-col gap-2 py-5 border-b">
         {quickSearchOptions.map((option) => (
           <SheetClose key={option.title} asChild>
             <Link
@@ -97,15 +114,18 @@ const SidebarSheet = () => {
         ))}
       </div>
 
+      {/* LOGOUT */}
       <div className="flex flex-col gap-2 py-5">
         {session?.user && (
-          <Button
-            variant="ghost"
-            className="justify-start gap-2"
-            onClick={() => signOut()}>
-            <LogOutIcon size={18} />
-            Sair da Conta
-          </Button>
+          <SheetClose asChild>
+            <Button
+              variant="ghost"
+              className="justify-start gap-2"
+              onClick={() => signOut()}>
+              <LogOutIcon size={18} />
+              Sair da Conta
+            </Button>
+          </SheetClose>
         )}
       </div>
     </SheetContent>
