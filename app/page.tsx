@@ -2,7 +2,7 @@ import Header from "@/components/ui/header";
 import BookingItem from "@/components/ui/booking-item";
 import { db } from "./_lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/_lib/auth"; // ✅ CORRETO
 import { notFound } from "next/navigation";
 import { Prisma } from "@prisma/client";
 
